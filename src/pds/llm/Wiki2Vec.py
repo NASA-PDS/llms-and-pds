@@ -3,51 +3,74 @@ import xmltodict
 import nltk
 from ssl_certificate import certificate
 from wikipedia2vec import Wikipedia2Vec
-import json
 
 # Set up SSL & download 'punkt'
 certificate()
+
+# Load the Wiki2Vec model
+MODEL_FILE = './enwiki_20180420_100d.pkl'
+wiki2vec = Wikipedia2Vec.load(MODEL_FILE)
+
 
 # Saturn Ionosphere Online XML Schema
 url1 = 'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml'
 url2 = 'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
 
-# Retrieve data from XML URL
-response = requests.get(url1)
-xml_data = response.text
-xml_dict = xmltodict.parse(xml_data)
-print(json.dumps(xml_dict, indent=4))
+tested_labels = [url1, url2]
 
-# Convert XML dict to string
-xml_string = json.dumps(xml_dict)
 
-# Tokenize XML data
-sentences = nltk.sent_tokenize(str(xml_string))
-tokens = [nltk.word_tokenize(sentence) for sentence in sentences]
-print(tokens)
 
-# Clean the tokens to rid of any non-alphabet/numerical characters
-clean_tokens = [[token.replace('_', ' ') for token in clean_tokens
-                 if '"' not in token and ',' not in token and '@' not in
-                 token and '`' not in token and ':' not in token and '{' not in
-                 token and "'" not in token and '.' not in token and ';' not in
-                 token and '#' not in token and '[' not in token and ']' not in
-                 token and '{' not in token and '}' not in token] for clean_tokens in tokens]
-print(clean_tokens)
 
-# Load the Wiki2Vec model
-MODEL_FILE = '/Users/arobinson/Documents/enwiki_20180420_100d.pkl'
-wiki2vec = Wikipedia2Vec.load(MODEL_FILE)
+
+
+
+
+def get_label_embeddings(url):
+    # Retrieve data from XML URL
+    response = requests.get(url1)
+    xml_data = response.text
+    xml_dict = xmltodict.parse(xml_data)
+
+    tokens = tokenize_dict(xml_dict, max_words=5)
+
+    return [wiki2vec.get_word_vector(token) for token in tokens if token in wiki2vec.dictionary]
+
+label_embeddings = {}
+for tested_label in tested_labels:
+    label_embeddings[tested_label] = get_label_embeddings(tested_label)
+
+search_terms = [
+    'soccer',
+    'saturn',
+    'cassini',
+    'casinni',
+    'huygens',
+    'orbiter',
+    'rss',
+    'ionospheric',
+    'ionosphere',
+    'elctron density',
+    'insight',
+    'context camera',
+    'camera',
+    'mars',
+    'image'
+]
+
+print("search term \turl1 \t url2")
+for search_term in search_terms:
+    for tested_label in tested_labels:
+        pass
 
 
 # Embed the tokens using Wiki2Vec
-embeddings = []
-for sentence_tokens in clean_tokens:
-    sentence_embeddings = [wiki2vec.get_word_vector(clean_tokens) for clean_tokens in sentence_tokens if clean_tokens in wiki2vec.dictionary]
-    # Use zip to pair up token and vector
-    for clean_tokens, embedding in zip(sentence_tokens, sentence_embeddings):
-        print(clean_tokens, embedding)
-        print()
+# embeddings = []
+# for sentence_tokens in clean_tokens:
+#     sentence_embeddings = [wiki2vec.get_word_vector(clean_tokens) for clean_tokens in sentence_tokens if clean_tokens in wiki2vec.dictionary]
+#     # Use zip to pair up token and vector
+#     for clean_tokens, embedding in zip(sentence_tokens, sentence_embeddings):
+#         print(clean_tokens, embedding)
+#         print()
 
 
 

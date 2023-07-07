@@ -19,8 +19,10 @@ sentences = nltk.sent_tokenize(xml_data)
 tokens = [nltk.word_tokenize(sentence) for sentence in sentences]
 
 # Load the pre-trained embedding model
-model_path = '/Users/arobinson/Documents/enwiki_20180420_100d.pkl'
+model_path = './enwiki_20180420_100d.pkl'
 wikipedia2vec_model = Wikipedia2Vec.load(model_path)
+
+wikipedia2vec_model.get_word_vector('soccer')
 
 # Embed the tokens using Wikipedia2Vec
 embeddings = []
