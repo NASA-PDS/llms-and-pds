@@ -4,17 +4,18 @@ import nltk
 from ssl_certificate import certificate
 from gensim.models import Word2Vec
 import json
-#import re
-#numpy. (idea of how close 2 vectors are)
+import numpy as np
+
+
 #Set up SSL & download 'punkt'
 certificate()
 
 # Saturn Ionosphere Online XML Schema
-#url = 'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/xml_schema/collection_schema_corss_saturn_ionosphere.xml'
-url = 'https://atmos.nmsu.edu/PDS/data/PDS4/go_ppr_bundle/xml_schema/collection_goppr_xml_schema.xml'
+url1 = 'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml'
+url2 = 'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
 
 #Retrive data from XML URL
-response = requests.get(url)
+response = requests.get(url1, url2)
 xml_data = response.text
 xml_dict = xmltodict.parse(xml_data)
 print(json.dumps(xml_dict, indent=4))
@@ -29,9 +30,13 @@ print(tokens)
 
 #Clean the tokens to rid of any non-alphabet/numerical characters
 #https://dylancastillo.co/nlp-snippets-clean-and-tokenize-text-with-python/#remove-a-tags-but-keep-its-content
-clean_tokens = [[token for token in sentence_tokens if '"' not in token and ',' not in token and '@' not in token and '`' not in token and ':' not in token and '{' not in token and "'" not in token and '.' not in token and ';' not in token and '#' not in token and '[' not in token and ']' not in token and '{' not in token and '}' not in token] for sentence_tokens in tokens]
+clean_tokens = [[token.replace('_', ' ') for token in clean_tokens
+                 if '"' not in token and ',' not in token and '@' not in
+                 token and '`' not in token and ':' not in token and '{' not in
+                 token and "'" not in token and '.' not in token and ';' not in
+                 token and '#' not in token and '[' not in token and ']' not in
+                 token and '{' not in token and '}' not in token] for clean_tokens in tokens]
 print(clean_tokens)
-#
 
 #Train the Word2Vec model
 word2vec_model = Word2Vec(tokens, min_count=1)
@@ -39,12 +44,20 @@ word2vec_model = Word2Vec(tokens, min_count=1)
 #Embed the tokens using Word2Vec
 embeddings = []
 for sentence_tokens in clean_tokens:
-    sentence_embeddings = [word2vec_model.wv[clean_tokens] for clean_tokens in sentence_tokens if clean_tokens in word2vec_model.wv]
-    if sentence_embeddings:
-        embeddings.append(sentence_embeddings)
-        print("Embeddings:", sentence_embeddings)
-        #Use zip to pair up token and vector
-        for token, embedding in zip(sentence_tokens, sentence_embeddings):
-            print(token, embedding)
-            print()
-#Should I also delete '_' and add spaces for more vectors on those groups of words
+    sentence_embeddings = [word2vec_model.wv[token] for token in sentence_tokens if token in word2vec_model.wv]
+    #Use zip to pair up token and vector
+    for token, embedding in zip(sentence_tokens, sentence_embeddings):
+        print(token, embedding)
+        print()
+
+search_terms = ['europa']
+distances = []
+for term in search_terms:
+    term_embedding = word2vec_model.wv[term]
+    term_distances = [np.dot(term_embedding, embedding) for embedding in sentence_embeddings]
+
+    distances.append(term_distances)
+
+print("Distances between embeddings & Search Terms:")
+for term, term_distances in zip(search_terms, distances):
+    print(F"{term}: {term_distances}")
