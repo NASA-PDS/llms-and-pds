@@ -30,7 +30,7 @@ search_terms = [
     'rss',
     'ionospheric',
     'ionosphere',
-    'elctron density',
+    'electron density',
     'insight',
     'context camera',
     'camera',
@@ -59,4 +59,7 @@ for s, se in search_terms_embeddings.items():
 
 print("that's it !")
 
-
+# products --> n words -->  n embeddings
+# search terms --> m words --> m embeddings
+# m*n distances (cosine similarities)
+# minimum
