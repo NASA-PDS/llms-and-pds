@@ -3,7 +3,7 @@ import xmltodict
 import json
 from nltk.tokenize import word_tokenize, sent_tokenize
 
-def tokenize_pds4_xml_files_AR(urls):
+def tokenize_pds4_xml_files_AR(urls, clean_tokens):
     response = requests.get(urls)
     xml_data = response.text
     xml_dict = xmltodict.parse(xml_data)

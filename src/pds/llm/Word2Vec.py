@@ -6,7 +6,6 @@ from gensim.models import Word2Vec
 import json
 import numpy as np
 
-
 #Set up SSL & download 'punkt'
 certificate()
 
@@ -30,34 +29,31 @@ print(tokens)
 
 #Clean the tokens to rid of any non-alphabet/numerical characters
 #https://dylancastillo.co/nlp-snippets-clean-and-tokenize-text-with-python/#remove-a-tags-but-keep-its-content
-clean_tokens = [[token.replace('_', ' ') for token in clean_tokens
-                 if '"' not in token and ',' not in token and '@' not in
+clean_tokens = [token for sentence_tokens in tokens for token in sentence_tokens if '"' not in token and ',' not in token and '@' not in
                  token and '`' not in token and ':' not in token and '{' not in
                  token and "'" not in token and '.' not in token and ';' not in
                  token and '#' not in token and '[' not in token and ']' not in
-                 token and '{' not in token and '}' not in token] for clean_tokens in tokens]
+                 token and '{' not in token and '}' not in token and '*' not in token]
 print(clean_tokens)
+
 
 #Train the Word2Vec model
 word2vec_model = Word2Vec(tokens, min_count=1)
 
 #Embed the tokens using Word2Vec
-embeddings = []
-for sentence_tokens in clean_tokens:
-    sentence_embeddings = [word2vec_model.wv[token] for token in sentence_tokens if token in word2vec_model.wv]
-    #Use zip to pair up token and vector
-    for token, embedding in zip(sentence_tokens, sentence_embeddings):
+for token in clean_tokens:
+    if token in word2vec_model.wv:
+        embedding = word2vec_model.wv[token]
         print(token, embedding)
         print()
 
-search_terms = ['europa']
-distances = []
-for term in search_terms:
-    term_embedding = word2vec_model.wv[term]
-    term_distances = [np.dot(term_embedding, embedding) for embedding in sentence_embeddings]
-
-    distances.append(term_distances)
-
-print("Distances between embeddings & Search Terms:")
-for term, term_distances in zip(search_terms, distances):
-    print(F"{term}: {term_distances}")
+# search_terms = ['Cassini']
+# distances = []
+# for term in search_terms:
+#     term_embedding = word2vec_model.wv[term]
+#     term_distances = [np.dot(term_embedding, embedding) for embedding in term_embedding]
+#     distances.append(term_distances)
+#
+# print("Distances between embeddings & Search Terms:")
+# for term, term_distances in zip(search_terms, distances):
+#     print(F"{term}: {term_distances}")
