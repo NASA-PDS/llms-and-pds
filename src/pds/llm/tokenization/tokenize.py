@@ -3,23 +3,25 @@ import xmltodict
 import json
 from nltk.tokenize import word_tokenize, sent_tokenize
 
-def tokenize_pds4_xml_files_AR(url, clean_tokens):
+
+def contains_symbol(token):
+    symbols = '",:{`.;#[]{*='
+    return any([symbol in token for symbol in symbols])
+
+
+def word_tokenize_pds4_xml_files(url):
     response = requests.get(url)
     xml_data = response.text
     xml_dict = xmltodict.parse(xml_data)
     xml_string = json.dumps(xml_dict)
     sentences = sent_tokenize(xml_string)
     tokens = [word_tokenize(sentence) for sentence in sentences]
-    clean_tokens = [token.lower() for sentence_tokens in tokens for token in sentence_tokens if
-                    '"' not in token and ',' not in token and '@' not in
-                    token and '`' not in token and ':' not in token and '{' not in
-                    token and "'" not in token and '.' not in token and ';' not in
-                    token and '#' not in token and '[' not in token and ']' not in
-                    token and '{' not in token and '}' not in token and '*' not in token and
-                    '=' not in token]
-    return(clean_tokens)
 
-def tokenize_from_pds4_label_url(url, max_words=-1):
+    clean_tokens = [token.lower() for sentence_tokens in tokens for token in sentence_tokens if not contains_symbol(token)]
+    return clean_tokens
+
+
+def sentence_tokenize_from_pds4_label_url(url, max_words=-1):
     response = requests.get(url)
     xml_data = response.text
     xml_dict = xmltodict.parse(xml_data)
