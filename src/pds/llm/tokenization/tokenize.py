@@ -3,15 +3,14 @@ import xmltodict
 import json
 from nltk.tokenize import word_tokenize, sent_tokenize
 
-def tokenize_pds4_xml_files_AR(urls, clean_tokens):
-    response = requests.get(urls)
+def tokenize_pds4_xml_files_AR(url, clean_tokens):
+    response = requests.get(url)
     xml_data = response.text
     xml_dict = xmltodict.parse(xml_data)
     xml_string = json.dumps(xml_dict)
     sentences = sent_tokenize(xml_string)
     tokens = [word_tokenize(sentence) for sentence in sentences]
-    clean_tokens = []
-    clean_tokens = [token for sentence_tokens in tokens for token in sentence_tokens if
+    clean_tokens = [token.lower() for sentence_tokens in tokens for token in sentence_tokens if
                     '"' not in token and ',' not in token and '@' not in
                     token and '`' not in token and ':' not in token and '{' not in
                     token and "'" not in token and '.' not in token and ';' not in

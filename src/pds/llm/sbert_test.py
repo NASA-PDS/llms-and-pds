@@ -50,12 +50,12 @@ def cosine_similarity(a, b):
 
 print("search term\turl1\turl2")
 for s, se in search_terms_embeddings.items():
-    min_cos_sims = []
+    max_cos_sims = []
     for p, les in label_embeddings.items():
         cos_sims = [cosine_similarity(se, le) for le in les]
-        min_cos_sims.append(str(min(cos_sims)))
+        max_cos_sims.append(str(max(cos_sims)))
     tab = '\t'
-    print(f"{s}{tab}{tab.join(min_cos_sims)}")
+    print(f"{s}{tab}{tab.join(max_cos_sims)}")
 
 print("that's it !")
 
