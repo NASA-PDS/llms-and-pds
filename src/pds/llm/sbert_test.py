@@ -1,12 +1,12 @@
 from sentence_transformers import SentenceTransformer
-from pds.llm.tokenization.tokenize import tokenize_from_pds4_label_url
+from pds.llm.tokenization.tokenize import sentence_tokenize_from_pds4_label_url
 import numpy as np
 from numpy.linalg import norm
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
 def get_label_embeddings(url, max_words=-1):
-    sentences = tokenize_from_pds4_label_url(url, max_words=max_words)
+    sentences = sentence_tokenize_from_pds4_label_url(url, max_words=max_words)
     return [model.encode(sentence) for sentence in sentences]
 
 
