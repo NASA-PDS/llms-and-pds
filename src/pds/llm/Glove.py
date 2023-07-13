@@ -68,7 +68,7 @@ def cosine_similarity_of_terms(embedding_vectors, word_vectors):
     return max_cos_sim
 
 def main():
-    glove_file = '/Users/arobinson/Documents/glove.840B.300d.txt' #Need to cp to pds llm
+    glove_file = '/Users/arobinson/Documents/glove.840B.300d.txt' #Need to cp to pds
     word_vectors = {}
     with open(glove_file, encoding= 'utf-8') as f:
         for line in f:
