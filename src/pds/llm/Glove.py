@@ -17,7 +17,7 @@ def get_embeddings(url, word_vectors):
             pass
     return vectors
 
-def cosine_similarity(a, b):
+def cosine_similarity(a, b): #
     return np.dot(a, b) / (norm(a) * norm(b))
 
 def cosine_similarity_of_terms(embedding_vectors, word_vectors):
