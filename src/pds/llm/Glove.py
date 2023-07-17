@@ -1,4 +1,4 @@
-from pds.llm.tokenization.tokenize import word_tokenize_pds4_xml_files
+from pds.llm.tokenization.tokenize import sentence_tokenize_from_pds4_label_url
 import numpy as np
 from numpy.linalg import norm
 
@@ -8,7 +8,7 @@ URLS = ['https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e
 
 
 def get_embeddings(url, word_vectors):
-    tokens = word_tokenize_pds4_xml_files(url)
+    tokens = sentence_tokenize_from_pds4_label_url(url)
     vectors = []
     for token in tokens:
         try:
@@ -64,7 +64,7 @@ def cosine_similarity_of_terms(embedding_vectors, word_vectors):
         match[st] = {}
         for url, sim in url_dict.items():
             match[st][url] = sim > threshold
-            print(st, url, sim>threshold)
+            print(st, url, sim > threshold)
     return max_cos_sim
 
 def main():
