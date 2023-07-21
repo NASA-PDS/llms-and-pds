@@ -1,5 +1,5 @@
 from wikipedia2vec import Wikipedia2Vec
-from pds.llm.tokenization.tokenize import word_tokenize_pds4_xml_files
+from pds.llm.tokenization.pds_tokenizer import word_tokenize_pds4_xml_files
 import numpy as np
 from numpy.linalg import norm
 
