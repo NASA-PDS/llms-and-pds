@@ -1,6 +1,6 @@
 import tensorflow_hub as hub
 import numpy as np
-from pds.llm.tokenization.tokenize import sentence_tokenize_from_pds4_label_url
+from .tokenization.pds_tokenizer import sentence_tokenize_from_pds4_label_url
 from numpy.linalg import norm
 
 URLS = [

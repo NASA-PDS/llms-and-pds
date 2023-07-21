@@ -1,5 +1,5 @@
 from wikipedia2vec import Wikipedia2Vec
-from pds.llm.tokenization.tokenize import word_tokenize_pds4_xml_files
+from .tokenization.pds_tokenizer import word_tokenize_pds4_xml_files
 import numpy as np
 from numpy.linalg import norm
 
@@ -12,7 +12,7 @@ URLS = ['https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e
         'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml']
 
 
-def get_embeddings(url):
+def get_embeddings(url, tokenizer=word_tokenize_pds4_xml_files):
 
     tokens = word_tokenize_pds4_xml_files(url)
     #Convert tokens to vectors

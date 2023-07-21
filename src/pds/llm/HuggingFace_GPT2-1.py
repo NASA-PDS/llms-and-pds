@@ -3,7 +3,7 @@ from transformers import GPT2Tokenizer, GPT2Model
 import requests
 import numpy as np
 from numpy.linalg import norm
-from pds.llm.tokenization.tokenize import sentence_tokenize_from_pds4_label_url
+from .tokenization.pds_tokenizer import sentence_tokenize_from_pds4_label_url
 
 URLS = [
     'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
