@@ -1,37 +1,32 @@
 import requests
-import os
-import logging
-import logging.config
+import xmltodict
+import nltk
+nltk.download('punkt')
+import json
+from wikipedia2vec import Wikipedia2Vec
 
-logging_conf_path = os.path.join(
-    os.path.dirname(__file__),
-    'logging.conf'
-)
-logging.config.fileConfig(logging_conf_path)
-logger = logging.getLogger(__name__)
+# Saturn Ionosphere Online XML Schema
+url = 'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/xml_schema/collection_schema_corss_saturn_ionosphere.xml'
 
-BASE_URL = 'https://pds.nasa.gov/api/search/1/'
+# Retrieve data from XML URL
+response = requests.get(url)
+xml_data = response.text
+xml_dict = xmltodict.parse(xml_data)
+print(json.dumps(xml_dict, indent=4))
 
+# Tokenize the XML data
+sentences = nltk.sent_tokenize(xml_data)
+tokens = [nltk.word_tokenize(sentence) for sentence in sentences]
 
-def get_labels():
-    products_resp = requests.get(BASE_URL + 'products')
+# Load the pre-trained embedding model
+model_path = './enwiki_20180420_100d.pkl'
+wikipedia2vec_model = Wikipedia2Vec.load(model_path)
 
-    products = products_resp.json()['data']
+wikipedia2vec_model.get_word_vector('soccer')
 
-    for product in products:
-        pds4_label_url = product['properties']['ops:Label_File_Info.ops:file_ref'][0]
-        try:
-            pds4_label_resp = requests.get(pds4_label_url)
-            if pds4_label_resp.status_code == 200:
-                print(pds4_label_resp.text)
-            else:
-                logger.debug("pds4 label not found %s, status %s", pds4_label_url, pds4_label_resp.status_code)
-        except Exception as e:
-            logger.debug("pds4 label not found %s, invalid URL %s", pds4_label_url, str(e))
-
-
-if __name__ == '__main__':
-    get_labels()
-
-
-
+# Embed the tokens using Wikipedia2Vec
+embeddings = []
+for sentence_tokens in tokens:
+    sentence_embeddings = [wikipedia2vec_model.get_word_vector(token) for token in sentence_tokens if token in wikipedia2vec_model]
+    if sentence_embeddings:
+        embeddings.append(sentence_embeddings)
