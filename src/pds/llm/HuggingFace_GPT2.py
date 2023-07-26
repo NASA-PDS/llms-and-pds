@@ -1,7 +1,12 @@
-from transformers import GPT2Tokenizer, FeatureExtractionPipeline, TFGPT2Model
+from transformers import GPT2Tokenizer
 import requests
 import json
 import xmltodict
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+
+
+feature_extraction_pipeline(word)[0]
 
 URLS = [
     'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
@@ -30,6 +35,36 @@ def get_chunks_of_tokens():
 
     return chunks_of_tokens
 
-def find_cosine_similarity_of_pds4_tokens(search_terms, embeddings):
-    feature_extraction_pipeline = FeatureExtractionPipeline(model=TFGPT2Model.from_pretrained('gpt2'), tokenizer=tokenizer)
 
+def find_cosine_similarity_of_pds4_tokens(search_terms, chunks_of_tokens):
+    tokenize_search_terms = [tokenizer(term, return_tensors='pt').input_ids for term in search_terms]
+    # Get the maximum length of the token sequences
+    max_seq_length = max(len(t) for t in chunks_of_tokens)
+    # Pad the sequences to the maximum length with zeros
+    tokenize_search_terms_padded = [np.pad(t.numpy().flatten(), (0, max_seq_length - len(t)), mode='constant') for t in tokenize_search_terms]
+    chunks_of_tokens_padded = [np.pad(t.numpy().flatten(), (0, max_seq_length - len(t)), mode='constant') for t in chunks_of_tokens]
+    similarities_of_search_terms = cosine_similarity(tokenize_search_terms_padded, chunks_of_tokens_padded)
+    return similarities_of_search_terms
+
+search_terms = ["saturn",
+                "saturn's rings",
+                "cassini",
+                "casinni",
+                "huygens",
+                "orbiter",
+                "rss",
+                "ionospheric",
+                "ionosphere",
+                "electron density",
+                "insight",
+                "context camera",
+                "camera",
+                "mars",
+                "image"]
+chunks_of_tokens = get_chunks_of_tokens()
+similarities = find_cosine_similarity_of_pds4_tokens(search_terms, chunks_of_tokens)
+
+#Print the cosine similarity scores for each
+for i, term in enumerate(search_terms):
+    print(f"Cosine similarity with '{term}':")
+    print(similarities[i])

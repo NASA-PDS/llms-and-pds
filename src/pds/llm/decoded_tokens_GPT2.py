@@ -1,9 +1,10 @@
-from transformers import GPT2Tokenizer
+from transformers import GPT2Tokenizer, GPT2LMHeadModel, FeatureExtractionPipeline
 import requests
 import json
 import xmltodict
 
 
+'''
 URLS = [
     'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
     'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
@@ -34,8 +35,9 @@ for url in URLS:
         print(f"Number of tokens for '{url}' (chunk {chunk_id}):", len(chunk[0]))
         decoded_tokens = tokenizer.decode(chunk[0], skip_special_tokens=True)
         print("Decoded Text:", decoded_tokens)
-
-'''Prints embeddings using Pipeline
+'''
+'''
+#Prints embeddings using Pipeline
 model = GPT2LMHeadModel.from_pretrained('gpt2')
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
 feature_extraction_pipeline = FeatureExtractionPipeline(model=model, tokenizer=tokenizer)
@@ -43,8 +45,8 @@ word = "Orion"
 word_embeddings = feature_extraction_pipeline(word)
 embedding_vector = word_embeddings[0]
 print("Embedding Vector:", embedding_vector)
+#feature_extraction_pipeline(word)[0]
 '''
-
 
 '''Returns vector/tensor of a given word & use numpy to convert to embedding
 model = GPT2LMHeadModel.from_pretrained('gpt2')
