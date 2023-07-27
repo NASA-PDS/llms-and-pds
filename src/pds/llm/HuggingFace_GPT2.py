@@ -1,52 +1,76 @@
-from transformers import GPT2Model, GPT2Tokenizer
-import torch
+from transformers import GPT2Tokenizer
 import requests
+import json
 import xmltodict
-import re
+from sklearn.metrics.pairwise import cosine_similarity
 
-def retrieve_data_from_urls(urls):
-    data = {}
-    for url in urls:
-        response = requests.get(url)
-        xml_data = response.text
-        xml_dict = xmltodict.parse(xml_data)
-        text_content = extract_text_content(xml_dict)
-        data[url] = text_content
-    return data
-
-def extract_text_content(xml_dict):
-    if isinstance(xml_dict, str):
-        return xml_dict
-    elif isinstance(xml_dict, list):
-        return ' '.join([extract_text_content(item) for item in xml_dict])
-    else:
-        return ' '.join([extract_text_content(value) for value in xml_dict.values()])
-
-def tokenize_and_encode_data(data, tokenizer):
-    encoded_inputs = tokenizer(list(data.values()), return_tensors='pt', padding=True, truncation=True)
-    if tokenizer.pad_token is None:
-        tokenizer.add_special_tokens({'pad_token': '[PAD]'})
-    return encoded_inputs
-
-# PDS4 XML Data URLs
-urls = [
+URLS = [
     'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
     'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
 ]
 
-# Initialize the GPT2 tokenizer & model
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-model = GPT2Model.from_pretrained('gpt2')
 
-# Retrieve PDS4 data from URLs
-pds4_data = retrieve_data_from_urls(urls)
+def get_pds4_xml_data(url):
+    response = requests.get(url)
+    xml_data = response.text
+    return xml_data
 
-# Tokenize and embed the PDS4 XML data
-encoded_inputs = tokenize_and_encode_data(pds4_data, tokenizer)
+def tokenize_pds4_xml_files(xml_data):
+    xml_dict = xmltodict.parse(xml_data)
+    xml_string = json.dumps(xml_dict)
+    pds_tokens = tokenizer(xml_string, return_tensors='pt').input_ids
+    return pds_tokens
 
-# Generate embeddings
-with torch.no_grad():  # Disable gradient calculation
-    outputs = model(**encoded_inputs)
-embeddings = outputs.last_hidden_state
+def get_chunks_of_tokens():
+    chunks_of_tokens = []
+    for url in URLS:
+        xml_label_data = get_pds4_xml_data(url)
+        xml_tokens = tokenize_pds4_xml_files(xml_label_data)
+        max_sequence_length_of_GPT2 = 1024
+        chunks_of_xml_labels = [xml_tokens[:, i:i + max_sequence_length_of_GPT2] for i in range(0, xml_tokens.shape[1], max_sequence_length_of_GPT2)]
+        chunks_of_tokens.extend(chunks_of_xml_labels)
 
-print(embeddings)
+    return chunks_of_tokens
+
+def find_cosine_similarity_of_pds4_tokens(search_terms, chunks_of_tokens):
+    tokenize_search_terms = [tokenizer(term, return_tensors='pt').input_ids for term in search_terms]
+    # Convert PyTorch tensors to NumPy arrays
+    tokenize_search_terms = [t.numpy().flatten() for t in tokenize_search_terms]
+    chunks_of_tokens = [t.numpy().flatten() for t in chunks_of_tokens]
+
+    similarities_of_search_terms = []
+    for i, term in enumerate(tokenize_search_terms):
+        try:
+            similarity = cosine_similarity([term], chunks_of_tokens)[0]
+            similarities_of_search_terms.append(similarity)
+        except ValueError:
+            print(f"Term '{search_terms[i]}' not found in language model. Skipping.")
+            pass
+
+    return similarities_of_search_terms
+
+search_terms = [
+    "saturn",
+    "saturn's rings",
+    "cassini",
+    "huygens",
+    "orbiter",
+    "rss",
+    "ionospheric",
+    "ionosphere",
+    "electron density",
+    "insight",
+    "context camera",
+    "camera",
+    "mars",
+    "image"
+]
+
+chunks_of_tokens = get_chunks_of_tokens()
+similarities = find_cosine_similarity_of_pds4_tokens(search_terms, chunks_of_tokens)
+
+# Print the cosine similarity scores for each search term
+for i, term in enumerate(search_terms):
+    print(f"Cosine similarity with '{term}':")
+    print(similarities[i])
