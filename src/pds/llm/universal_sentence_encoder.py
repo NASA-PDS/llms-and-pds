@@ -1,12 +1,12 @@
 import tensorflow_hub as hub
 import numpy as np
-from .tokenization.pds_tokenizer import sentence_tokenize_from_pds4_label_url
+from tokenization.pds_tokenizer import sentence_tokenize_from_pds4_label_url
 from numpy.linalg import norm
 
-URLS = [
-    'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
-    'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
-]
+URLS = {
+    'cassini':'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
+    'insight': 'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
+}
 
 
 def get_embeddings(url, use_model):
@@ -63,8 +63,8 @@ def cosine_similarity_of_terms(embedding_vectors, use_model):
 def main():
     use_model = hub.load('https://tfhub.dev/google/universal-sentence-encoder/4')  # Load the USE model
     embeddings = {}
-    for url in URLS:
-        embeddings[url] = get_embeddings(url, use_model)
+    for url_key, url_value in URLS.items():
+        embeddings[url_value] = get_embeddings(url_value, use_model)
     similarities = cosine_similarity_of_terms(embeddings, use_model)
 
 
