@@ -1,19 +1,16 @@
-from transformers import GPT2Tokenizer, GPT2Model
-import requests
-import json
-import xmltodict
-import numpy as np
-from numpy.linalg import norm
-import statistics
-import pandas as pd
-from scipy.sparse import csr_matrix
+from transformers import GPT2LMHeadModel, FeatureExtractionPipeline, GPT2Tokenizer
+from tokenization.pds_tokenizer import word_tokenize_pds4_xml_files
+import re
+
 
 URLS = {
     "cassini": 'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
     "insight": 'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
 }
-tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-model = GPT2Model.from_pretrained('gpt2')
+tokenize = GPT2Tokenizer.from_pretrained('gpt2')
+model = GPT2LMHeadModel.from_pretrained('gpt2')
+feature_extraction_pipeline = FeatureExtractionPipeline(model=model, tokenizer=tokenize)
+
 search_terms = [
     "saturn",
     "saturn's rings",
@@ -31,25 +28,51 @@ search_terms = [
     "image"
 ]
 
-def get_pds4_xml_data(url):
-    response = requests.get(url)
-    xml_data = response.text
-    return xml_data
 
-def parse_xml_like_data(xml_data):
-    lines = xml_data.strip().split('\n')
-    data_dict = {}
-    for line in lines:
-        key_value = line.split(' ', 1)
-        if len(key_value) == 2:
-            key, value = key_value
-            try:
-                data_dict[key] = csr_matrix([float(value)])
-            except ValueError:
-                pass
-    return data_dict
+def clean_tokens_before_embedding(tokens):
+    pattern = r"[^a-zA-Z0-9' ]"
+    clean_tokens = [re.sub(pattern, '', token) for token in tokens]
+    clean_tokens = [token.replace("'", "").replace('"', '') for token in clean_tokens]
+    clean_tokens = [token for token in clean_tokens if token.strip()]
+    return clean_tokens
 
+def get_tokens(url):
+    tokens = word_tokenize_pds4_xml_files(url)
+    clean_tokens = clean_tokens_before_embedding(tokens)
+    return clean_tokens
 
+def get_embeddings_for_pds_labels(tokens):
+    embeddings = feature_extraction_pipeline(tokens)
+    return embeddings
+def get_embeddings_for_search_terms(search_terms):
+    search_embeddings = feature_extraction_pipeline(search_terms)
+    return search_embeddings
+def main():
+    label_embeddings = {}
+    search_term_embeddings = {}
+    for label, url in URLS.items():
+        tokens = get_tokens(url)
+        embeddings = get_embeddings_for_pds_labels(tokens)
+        label_embeddings[label] = embeddings
+
+    search_embeddings = get_embeddings_for_search_terms(search_terms)
+    for i, term in enumerate(search_terms):
+        search_term_embeddings[term] = search_embeddings[i][0]
+    print(label_embeddings)
+    print(search_term_embeddings)
+if __name__ == '__main__':
+    main()
+
+'''
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (norm(a) * norm(b))
+
+def get_token_max_similarity(v_ref, vs):
+    cos_sims = [cosine_similarity(v_ref, v) for v in vs]
+    return max(cos_sims)
+'''
+
+'''
 def get_tensors_for_pds_labels(data_dict):
     xml_dict = xmltodict.parse(data_dict)
     xml_string = json.dumps(xml_dict)
@@ -105,8 +128,10 @@ def main():
 
 if __name__ == '__main__':
     main()
+'''
 
 '''
+from transformers import GPT2Tokenizer, GPT2LMHeadModel, FeatureExtractionPipeline
 #Prints embeddings using Pipeline
 model = GPT2LMHeadModel.from_pretrained('gpt2')
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
