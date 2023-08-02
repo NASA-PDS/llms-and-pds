@@ -1,11 +1,11 @@
-from .tokenization.pds_tokenizer import sentence_tokenize_from_pds4_label_url
+from tokenization.pds_tokenizer import sentence_tokenize_from_pds4_label_url
 import numpy as np
 from numpy.linalg import norm
 
-URLS = ['https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
-        'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml']
-
-
+URLS = {
+    "cassini": 'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
+    "insight": 'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
+}
 
 def get_embeddings(url, word_vectors):
     tokens = sentence_tokenize_from_pds4_label_url(url)
@@ -17,7 +17,7 @@ def get_embeddings(url, word_vectors):
             pass
     return vectors
 
-def cosine_similarity(a, b): #
+def cosine_similarity(a, b):
     return np.dot(a, b) / (norm(a) * norm(b))
 
 def cosine_similarity_of_terms(embedding_vectors, word_vectors):
@@ -68,9 +68,9 @@ def cosine_similarity_of_terms(embedding_vectors, word_vectors):
     return max_cos_sim
 
 def main():
-    glove_file = '/Users/arobinson/Documents/glove.840B.300d.txt' #Need to cp to pds llm
+    glove_file = '/Users/arobinson/Documents/glove.840B.300d.txt'
     word_vectors = {}
-    with open(glove_file, encoding= 'utf-8') as f:
+    with open(glove_file, encoding='utf-8') as f:
         for line in f:
             values = line.split()
             word = values[0]
@@ -81,11 +81,9 @@ def main():
                 pass
 
     embeddings = {}
-    for url in URLS:
-        embeddings[url] = get_embeddings(url, word_vectors)
+    for url_key, url_value in URLS.items():
+        embeddings[url_key] = get_embeddings(url_value, word_vectors)
     similarities = cosine_similarity_of_terms(embeddings, word_vectors)
-
 
 if __name__ == '__main__':
     main()
-

@@ -9,10 +9,10 @@ URLS = {
 }
 
 
-def get_embeddings(url, use_model):
+def get_embeddings(url, embedder):
     tokens = sentence_tokenize_from_pds4_label_url(url)
     sentences = [' '.join(tokens)]
-    embeddings = use_model(sentences)
+    embeddings = embedder(sentences)
     return embeddings
 
 

@@ -1,5 +1,5 @@
 from wikipedia2vec import Wikipedia2Vec
-from pds.llm.tokenization.tokenize import word_tokenize_pds4_xml_files
+from tokenization.pds_tokenizer import word_tokenize_pds4_xml_files
 import numpy as np
 from numpy.linalg import norm
 import statistics
@@ -62,8 +62,6 @@ def get_search_embeddings(term):
             print(f"term {token} not found in model")
             pass
     return search_embeddings
-
-
 def cosine_similarity(a, b):
     return np.dot(a, b) / (norm(a) * norm(b))
 
@@ -98,3 +96,4 @@ def main():
 
     df = pd.DataFrame(mean_max_sims)
     print(df)
+
