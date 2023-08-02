@@ -6,7 +6,7 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 
 
 def contains_symbol(token):
-    symbols = '",:{`.;#[]{*='
+    symbols = '",:{`.;#[]{*=@\''
     return any([symbol in token for symbol in symbols])
 
 

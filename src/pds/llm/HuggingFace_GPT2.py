@@ -95,9 +95,6 @@ def main():
     df = pd.DataFrame(mean_max_sims)
     print(df)
 
-if __name__ == '__main__':
-    main()
-
 
 if __name__ == '__main__':
     main()
