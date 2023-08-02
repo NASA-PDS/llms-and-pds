@@ -1,42 +1,44 @@
-from wikipedia2vec import Wikipedia2Vec
-from pds.llm.tokenization.tokenize import word_tokenize_pds4_xml_files
-import numpy as np
-from numpy.linalg import norm
 import statistics
+
+import numpy as np
 import pandas as pd
+from numpy.linalg import norm
+from pds.llm.tokenization.tokenize import word_tokenize_pds4_xml_files
+
+from wikipedia2vec import Wikipedia2Vec
 
 
-MODEL_FILE = './enwiki_20180420_100d.pkl'
+MODEL_FILE = "./enwiki_20180420_100d.pkl"
 
 wiki2vec = Wikipedia2Vec.load(MODEL_FILE)
 
 URLS = {
-    'cassini':'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
-    'insight': 'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
+    "cassini": "https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml",
+    "insight": "https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml",
 }
 
 SEARCH_TERMS = [
-        'soccer',
-        'saturn',
-        'cassini',
-        'casinni',
-        'huygens',
-        'orbiter',
-        'rss',
-        'ionospheric',
-        'ionosphere',
-        'electron density',
-        'insight',
-        'context camera',
-        'camera',
-        'mars',
-        'image'
-    ]
+    "soccer",
+    "saturn",
+    "cassini",
+    "casinni",
+    "huygens",
+    "orbiter",
+    "rss",
+    "ionospheric",
+    "ionosphere",
+    "electron density",
+    "insight",
+    "context camera",
+    "camera",
+    "mars",
+    "image",
+]
+
 
 def get_label_embeddings(url):
-
     tokens = word_tokenize_pds4_xml_files(url)
-    #Convert tokens to vectors
+    # Convert tokens to vectors
     vectors = []
     for token in tokens:
         try:
@@ -44,7 +46,7 @@ def get_label_embeddings(url):
         except KeyError:
             pass
         # not sure if `token in wiki2vec.dictionary` works as we want it to
-        #vectors = [wiki2vec.get_word_vector(token) for token in tokens if token in wiki2vec.dictionary]
+        # vectors = [wiki2vec.get_word_vector(token) for token in tokens if token in wiki2vec.dictionary]
 
     return vectors
 

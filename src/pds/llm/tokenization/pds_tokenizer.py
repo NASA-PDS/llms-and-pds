@@ -1,12 +1,17 @@
+import json
+import xml
+
 import requests
 import xmltodict
-import xml
-import json
-from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk.tokenize import sent_tokenize
+from nltk.tokenize import word_tokenize
 
 
 def contains_symbol(token):
-    symbols = '",:{`.;#[]{*=@\''
+    """Returns True if the token contains a special character,
+    from a hardcoded list."""
+
+    symbols = "\",:{`.;#[]{*=@'"
     return any([symbol in token for symbol in symbols])
 
 
@@ -28,7 +33,9 @@ def word_tokenize_pds4_xml_files(url):
             sentences = sent_tokenize(xml_string)
             tokens = [word_tokenize(sentence) for sentence in sentences]
 
-            clean_tokens = [token.lower() for sentence_tokens in tokens for token in sentence_tokens if not contains_symbol(token)]
+            clean_tokens = [
+                token.lower() for sentence_tokens in tokens for token in sentence_tokens if not contains_symbol(token)
+            ]
             return clean_tokens
         else:
             raise UnReachableCollectionException(f"Collection {url} can not be reached, status {response.status_code}")
@@ -62,7 +69,7 @@ def simple_word_tokenizer(url):
 
 def word_tokenize_dict(d):
     if isinstance(d, str):
-        return [t for t in word_tokenize(d) if t not in ':(),.*']
+        return [t for t in word_tokenize(d) if t not in ":(),.*"]
     elif isinstance(d, list):
         tokens = []
         for e in d:
@@ -80,8 +87,8 @@ def word_tokenize_dict(d):
 def tokenize_dict(d, prefix=[], max_words=-1):
     if isinstance(d, str):
         if max_words != -1:
-           words = d.split(" ")
-           return [" ".join(words[i:i+max_words]) for i in range(0, len(words), max_words)]
+            words = d.split(" ")
+            return [" ".join(words[i : i + max_words]) for i in range(0, len(words), max_words)]
         else:
             prefix_str = " ".join(prefix[-2:])
             return [f"{prefix_str} {d}".strip()]

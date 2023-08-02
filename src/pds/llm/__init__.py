@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """My PDS Module."""
-import pkg_resources
-import os
 import logging.config
+import os
+
+import pkg_resources
 
 
 __version__ = pkg_resources.resource_string(__name__, "VERSION.txt").decode("utf-8").strip()
 
 file_dir = os.path.dirname(__file__)
-logConfig = os.path.join(file_dir, 'logging.conf')
+logConfig = os.path.join(file_dir, "logging.conf")
 logging.config.fileConfig(logConfig)
 
 # For future consideration:

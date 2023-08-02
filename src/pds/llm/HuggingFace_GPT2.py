@@ -1,17 +1,20 @@
-from transformers import GPT2Tokenizer, GPT2LMHeadModel, FeatureExtractionPipeline
-from tokenization.pds_tokenizer import word_tokenize_pds4_xml_files
 import re
-from sklearn.metrics.pairwise import cosine_similarity
+
 import numpy as np
 import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+from tokenization.pds_tokenizer import word_tokenize_pds4_xml_files
+from transformers import FeatureExtractionPipeline
+from transformers import GPT2LMHeadModel
+from transformers import GPT2Tokenizer
 
 URLS = {
-    "cassini": 'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
-    "insight": 'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
+    "cassini": "https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml",
+    "insight": "https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml",
 }
 
-tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-model = GPT2LMHeadModel.from_pretrained('gpt2')
+tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+model = GPT2LMHeadModel.from_pretrained("gpt2")
 feature_extraction_pipeline = FeatureExtractionPipeline(model=model, tokenizer=tokenizer)
 
 search_terms = [
@@ -28,16 +31,17 @@ search_terms = [
     "context camera",
     "camera",
     "mars",
-    "image"
+    "image",
 ]
 
 
 def clean_tokens_before_embedding(tokens):
     pattern = r"[^a-zA-Z0-9' ]"
-    clean_tokens = [re.sub(pattern, '', token) for token in tokens]
-    clean_tokens = [token.replace("'", "").replace('"', '') for token in clean_tokens]
+    clean_tokens = [re.sub(pattern, "", token) for token in tokens]
+    clean_tokens = [token.replace("'", "").replace('"', "") for token in clean_tokens]
     clean_tokens = [token for token in clean_tokens if token.strip()]
     return clean_tokens
+
 
 def pad_sequences(sequences, max_length, padding_token):
     padded_sequences = [seq[:max_length] + [padding_token] * max(0, max_length - len(seq)) for seq in sequences]
@@ -60,9 +64,11 @@ def get_embeddings_for_search_terms(search_terms):
     embeddings_list = [item[0] for item in search_embeddings]
     return np.array(embeddings_list)
 
+
 def get_token_max_similarity(v_ref, vs):
     cos_sims = [cosine_similarity(v_ref, v) for v in vs]
     return max(cos_sims)
+
 
 def main():
     label_embeddings = {}
@@ -96,5 +102,5 @@ def main():
     print(df)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

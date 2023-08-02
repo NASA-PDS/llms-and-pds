@@ -1,18 +1,19 @@
-from transformers import GPT2LMHeadModel, FeatureExtractionPipeline, GPT2Tokenizer
+"""Runs the cosine similarity comparison test bed using the GPT2 model from HuggingFace."""
+from statistics import mean
 
-from pds.llm.tokenization.pds_tokenizer import word_tokenize_pds4_xml_files
 import numpy as np
-from numpy.linalg import norm
-import statistics
 import pandas as pd
+from numpy.linalg import norm
+from pds.llm.tokenization.pds_tokenizer import word_tokenize_pds4_xml_files
+from transformers import GPT2LMHeadModel
+from transformers import GPT2Tokenizer
 
-
-tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-model = GPT2LMHeadModel.from_pretrained('gpt2')
-feature_extraction_pipeline = FeatureExtractionPipeline(model=model, tokenizer=tokenizer)
+tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+model = GPT2LMHeadModel.from_pretrained("gpt2")
 
 
 def get_label_embeddings(url):
+    """For one pds4 label's URL returns the embeddings of each of its tokens."""
     vectors = []
     tokens = word_tokenize_pds4_xml_files(url)
     for token in tokens:
@@ -23,9 +24,15 @@ def get_label_embeddings(url):
 
 
 def get_search_embeddings(term):
-    """
-    for each token of the search terms, e.g. `context camera` return an embeddings.
-    the embedding are stored in a dictionary which key is the search token
+    """For each token of the search terms, e.g. `context camera` return an embeddings.
+    the embedding are stored in a list.
+
+    Args:
+        -term- search term for which to compute the embeddings
+
+    Returns:
+         The embedding for each word token of the term.
+
     """
     search_embeddings = []
     for token in term.split(" "):
@@ -36,18 +43,26 @@ def get_search_embeddings(term):
 
 
 def cosine_similarity(a, b):
+    """Returns the cosine similarity between a and b vector (as list).
+    a and b must have the same length.
+
+    """
     return np.dot(a, b) / (norm(a) * norm(b))
 
 
 def get_token_max_similarity(v_ref, vs):
-    """
-    get the max cosine simlarity between vector v_ref and vectors vs
-    """
+    """Returns the max cosine similarity between vector v_ref and vectors vs."""
     cos_sims = [cosine_similarity(v_ref, v) for v in vs]
     return max(cos_sims)
 
 
 def get_cosine_similarities(urls, search_terms):
+    """Returns panda dataframe of the max averaged cosine similarities between urls and search_terms.
+    each url is a column, each search term is a line.
+    Values are the max averaged similarities for each PDS4 label url's token (max)
+    and each search term, e.g. electron density (average).
+
+    """
     label_embbedings = {}
     for k, v in urls.items():
         label_embbedings[k] = get_label_embeddings(v)
@@ -59,39 +74,39 @@ def get_cosine_similarities(urls, search_terms):
     mean_max_sims = []
     for search_term in search_terms:
         line = dict(search_term=search_term)
-        for label, url in urls.items():
+        for label, _ in urls.items():
             max_similarities = []
             for vector in search_embeddings[search_term]:
                 max_similarity = get_token_max_similarity(vector, label_embbedings[label])
                 max_similarities.append(max_similarity)
-            line[label] = statistics.mean(max_similarities) if max_similarities else np.nan
+            line[label] = mean(max_similarities) if max_similarities else np.nan
         mean_max_sims.append(line)
 
-    df = pd.DataFrame(mean_max_sims)
-    print(df)
+    return pd.DataFrame(mean_max_sims)
 
 
 if __name__ == "__main__":
     URLS = {
-        'cassini': 'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
-        'insight': 'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
+        "cassini": "https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml",
+        "insight": "https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml",
     }
 
     SEARCH_TERMS = [
-        'soccer',
-        'saturn',
-        'cassini',
-        'casinni',
-        'huygens',
-        'orbiter',
-        'rss',
-        'ionospheric',
-        'ionosphere',
-        'electron density',
-        'insight',
-        'context camera',
-        'camera',
-        'mars',
-        'image'
+        "soccer",
+        "saturn",
+        "cassini",
+        "casinni",
+        "huygens",
+        "orbiter",
+        "rss",
+        "ionospheric",
+        "ionosphere",
+        "electron density",
+        "insight",
+        "context camera",
+        "camera",
+        "mars",
+        "image",
     ]
-    get_cosine_similarities(URLS, SEARCH_TERMS)
+    similarities_df = get_cosine_similarities(URLS, SEARCH_TERMS)
+    print(similarities_df)

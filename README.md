@@ -1,4 +1,4 @@
-# My Project
+# LLM tests for PDS
 
 Code used to experiemnt with LLM for PDS
 
@@ -49,4 +49,3 @@ Install in editable mode and with extra developer dependencies into your virtual
 Run:
 
     python pds/llm/get_pds4_inputs.py
-

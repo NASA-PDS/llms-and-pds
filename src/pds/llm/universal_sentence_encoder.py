@@ -1,17 +1,17 @@
-import tensorflow_hub as hub
 import numpy as np
-from tokenization.pds_tokenizer import sentence_tokenize_from_pds4_label_url
+import tensorflow_hub as hub
 from numpy.linalg import norm
+from tokenization.pds_tokenizer import sentence_tokenize_from_pds4_label_url
 
 URLS = {
-    'cassini':'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
-    'insight': 'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
+    "cassini": "https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml",
+    "insight": "https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml",
 }
 
 
 def get_embeddings(url, use_model):
     tokens = sentence_tokenize_from_pds4_label_url(url)
-    sentences = [' '.join(tokens)]
+    sentences = [" ".join(tokens)]
     embeddings = use_model(sentences)
     return embeddings
 
@@ -22,21 +22,21 @@ def cosine_similarity(a, b):
 
 def cosine_similarity_of_terms(embedding_vectors, use_model):
     search_terms = [
-        'soccer',
-        'saturn',
-        'cassini',
-        'cassini',
-        'huygens',
-        'orbiter',
-        'rss',
-        'ionospheric',
-        'ionosphere',
-        'electron density',
-        'insight',
-        'context camera',
-        'camera',
-        'mars',
-        'image'
+        "soccer",
+        "saturn",
+        "cassini",
+        "cassini",
+        "huygens",
+        "orbiter",
+        "rss",
+        "ionospheric",
+        "ionosphere",
+        "electron density",
+        "insight",
+        "context camera",
+        "camera",
+        "mars",
+        "image",
     ]
     search_embeddings = {}
     max_cos_sim = {}
@@ -48,7 +48,7 @@ def cosine_similarity_of_terms(embedding_vectors, use_model):
             for emb in emb_set:
                 cos_sim.append(cosine_similarity(search_embeddings[term][0:], emb))
             max_cos_sim[term][url] = max(cos_sim) if len(cos_sim) > 0 else np.nan
-        print(f'{term} {[v for v in max_cos_sim[term].values()]}')
+        print(f"{term} {[v for v in max_cos_sim[term].values()]}")
 
     threshold = 0.6
     match = {}
@@ -61,12 +61,12 @@ def cosine_similarity_of_terms(embedding_vectors, use_model):
 
 
 def main():
-    use_model = hub.load('https://tfhub.dev/google/universal-sentence-encoder/4')  # Load the USE model
+    use_model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")  # Load the USE model
     embeddings = {}
     for url_key, url_value in URLS.items():
         embeddings[url_value] = get_embeddings(url_value, use_model)
     similarities = cosine_similarity_of_terms(embeddings, use_model)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

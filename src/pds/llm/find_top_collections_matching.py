@@ -1,11 +1,12 @@
 import pickle
 import statistics
-from nltk.tokenize import word_tokenize
-from wikipedia2vec import Wikipedia2Vec
 
+from nltk.tokenize import word_tokenize
 from pds.llm.Wiki2Vec import cosine_similarity
 
-MODEL_FILE = './enwiki_20180420_100d.pkl'
+from wikipedia2vec import Wikipedia2Vec
+
+MODEL_FILE = "./enwiki_20180420_100d.pkl"
 wiki2vec = Wikipedia2Vec.load(MODEL_FILE)
 
 
@@ -21,7 +22,7 @@ def search_for(search_term: str):
         for token in search_tokens:
             token_embedding = wiki2vec.get_word_vector(token)
             best_sim = max([cosine_similarity(token_embedding, e) for e in embeddings])
-            collection_sim['sims'].append(best_sim)
+            collection_sim["sims"].append(best_sim)
         collection_sims.append(collection_sim)
 
     collection_sims.sort(key=lambda x: statistics.mean(x["sims"]), reverse=True)
@@ -32,10 +33,3 @@ def search_for(search_term: str):
 while True:
     search_term = input("what are you searching for ?")
     print(search_for(search_term)[:10])
-
-
-
-
-
-
-

@@ -1,13 +1,15 @@
-import requests
 import logging
-import tokenization.pds_tokenizer as pt
-from wikipedia2vec import Wikipedia2Vec
 import pickle
+
+import requests
+import tokenization.pds_tokenizer as pt
+
+from wikipedia2vec import Wikipedia2Vec
 
 logger = logging.getLogger(__name__)
 
 
-MODEL_FILE = './enwiki_20180420_100d.pkl'
+MODEL_FILE = "./enwiki_20180420_100d.pkl"
 
 wiki2vec = Wikipedia2Vec.load(MODEL_FILE)
 
@@ -23,18 +25,13 @@ def get_wiki2vec_embeddings(tokens: list[str]):
 
 
 def get_one_page_of_url_embeddings(
-        start=1,
-        limit=100,
-        tokenizer=pt.simple_word_tokenizer,
-        get_embeddings=get_wiki2vec_embeddings
-    ):
+    start=1, limit=100, tokenizer=pt.simple_word_tokenizer, get_embeddings=get_wiki2vec_embeddings
+):
     params = dict(start=start, limit=limit)
-    api_response = requests.get(
-        collection_url,
-        params=params)
+    api_response = requests.get(collection_url, params=params)
 
     products = api_response.json()["data"]
-    urls = [p['properties']['ops:Label_File_Info.ops:file_ref'][0] for p in products]
+    urls = [p["properties"]["ops:Label_File_Info.ops:file_ref"][0] for p in products]
 
     url_embeddings = {}
     for url in urls:
@@ -60,5 +57,5 @@ def main():
         pickle.dump(all_url_embeddings, f)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
