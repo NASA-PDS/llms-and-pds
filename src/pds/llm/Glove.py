@@ -1,14 +1,12 @@
-from tokenization.pds_tokenizer import sentence_tokenize_from_pds4_label_url
+from tokenization.pds_tokenizer import word_tokenize_pds4_xml_files
 import numpy as np
 from numpy.linalg import norm
 
-URLS = {
-    "cassini": 'https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
-    "insight": 'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml'
-}
+URLS = ['https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
+        'https://planetarydata.jpl.nasa.gov/img/data/nsyt/insight_cameras/data/sol/0024/mipl/edr/icc/C000M0024_598662821EDR_F0000_0558M2.xml']
 
 def get_embeddings(url, word_vectors):
-    tokens = sentence_tokenize_from_pds4_label_url(url)
+    tokens = word_tokenize_pds4_xml_files(url)
     vectors = []
     for token in tokens:
         try:
@@ -81,9 +79,14 @@ def main():
                 pass
 
     embeddings = {}
-    for url_key, url_value in URLS.items():
-        embeddings[url_key] = get_embeddings(url_value, word_vectors)
+    for url in URLS:
+        embeddings[url] = get_embeddings(url, word_vectors)
     similarities = cosine_similarity_of_terms(embeddings, word_vectors)
 
 if __name__ == '__main__':
     main()
+
+'''
+Glove files can be downloaded at the following:
+https://github.com/stanfordnlp/GloVe
+'''
