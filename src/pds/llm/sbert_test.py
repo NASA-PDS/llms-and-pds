@@ -1,5 +1,5 @@
 from sentence_transformers import SentenceTransformer
-from .tokenization.pds_tokenizer import sentence_tokenize_from_pds4_label_url
+from tokenization.pds_tokenizer import sentence_tokenize_from_pds4_label_url
 import numpy as np
 from numpy.linalg import norm
 
