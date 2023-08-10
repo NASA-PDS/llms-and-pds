@@ -64,6 +64,9 @@ def get_search_embeddings(term):
     return search_embeddings
 
 
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (norm(a) * norm(b))
+
 
 def get_token_max_similarity(v_ref, vs):
     """
@@ -73,8 +76,7 @@ def get_token_max_similarity(v_ref, vs):
     return max(cos_sims)
 
 
-def main():def cosine_similarity(a, b):
-    return np.dot(a, b) / (norm(a) * norm(b))
+def main():
     label_embbedings = {}
     for k, v in URLS.items():
         label_embbedings[k] = get_label_embeddings(v)
@@ -96,6 +98,7 @@ def main():def cosine_similarity(a, b):
 
     df = pd.DataFrame(mean_max_sims)
     print(df)
+
 
 if __name__ == '__main__':
     main()
