@@ -1,22 +1,10 @@
 # My Project
 
-Code used to experiemnt with LLM for PDS
+Code used to experiment with LLM for PDS
 
 ## Prerequisites
 
 python 3.9
-
-## User Quickstart
-
-Install with:
-
-    pip install my_pds_module
-
-If possible, make it so that your program works out of the box without any additional configuration—but see the [Configuration](###configuration) section for details.
-
-To execute, run:
-
-    (put your run commands here)
 
 
 ## Code of Conduct
@@ -46,7 +34,50 @@ Install in editable mode and with extra developer dependencies into your virtual
     pip install -e '.[dev]'
 
 
-Run:
+### Run:
 
-    python pds/llm/get_pds4_inputs.py
+#### Test bed for some LLM models
+
+##### GPT2
+
+    python src/pds/llm/GPT2.py
+
+##### S-BERT
+
+    python src/pds/llm/sbert_test.py
+
+
+
+##### Glove model (Work in Progress):
+
+Download model from https://www.kaggle.com/datasets/sadikaljarif/global-vectorglove?resource=download
+Save it to `src/pds/llm/models/`:
+
+    python src/pds/llm/Glove.py
+
+##### Wikipedia2vec
+
+Download model from https://wikipedia2vec.github.io/wikipedia2vec/pretrained/ 
+Save it do `src/pds/llm/models/`:
+
+    python src/pds/llm/Wiki2Vec.py
+
+##### Others
+
+Other tests have been done with Universal Sentence Encoder model and Fast_Text models.
+
+
+
+#### Dynamic search
+
+##### Pre-compute embeddings for collections
+
+    python src/pds/llm/embedding_all_collections.py
+
+##### Search for collections
+
+    python src/pds/llm/find_top_collections_matching.py
+
+
+    
 

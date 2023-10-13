@@ -1,12 +1,16 @@
+import os
 from wikipedia2vec import Wikipedia2Vec
-from tokenization.pds_tokenizer import word_tokenize_pds4_xml_files
+from pds.llm.tokenization.pds_tokenizer import word_tokenize_pds4_xml_files
 import numpy as np
 from numpy.linalg import norm
 import statistics
 import pandas as pd
 
 
-MODEL_FILE = './enwiki_20180420_100d.pkl'
+MODEL_FILE = os.path.join(
+        os.path.dirname(__file__),
+        "models/enwiki_20180420_100d.pkl"
+)
 
 wiki2vec = Wikipedia2Vec.load(MODEL_FILE)
 

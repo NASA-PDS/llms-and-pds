@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 from tokenization.pds_tokenizer import word_tokenize_pds4_xml_files
+=======
+from pds.llm.tokenization.pds_tokenizer import sentence_tokenize_from_pds4_label_url
+>>>>>>> 9bd18d5 (test/fix some model run)
 import numpy as np
+import os
 from numpy.linalg import norm
 
 URLS = ['https://atmos.nmsu.edu/PDS/data/PDS4/saturn_iono/data/rss_s10_r007_ne_e.xml',
@@ -66,7 +71,14 @@ def cosine_similarity_of_terms(embedding_vectors, word_vectors):
     return max_cos_sim
 
 def main():
+<<<<<<< HEAD
     glove_file = '/Users/arobinson/Documents/glove.840B.300d.txt'
+=======
+    glove_file = os.path.join(
+        os.path.dirname(__file__),
+        "models/glove.840B.300d.txt"
+    )
+>>>>>>> 9bd18d5 (test/fix some model run)
     word_vectors = {}
     with open(glove_file, encoding='utf-8') as f:
         for line in f:
