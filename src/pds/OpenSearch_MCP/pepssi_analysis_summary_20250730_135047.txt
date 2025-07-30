@@ -1,0 +1,99 @@
+
+REAL PEPSSI DATA ANALYSIS REPORT
+================================
+
+File Information:
+- LIDVID: urn:nasa:pds:nh_pepssi:kem1_cal:pep_0510213116_0x691_sci
+- Original file: pep_0510213116_0x691_sci.fit
+- Download URL: https://pds-smallbodies.astro.umd.edu/holdings/pds4-nh_pepssi:kem1_cal-v1.0/data/20220322_051021/pep_0510213116_0x691_sci.fit
+- Local path: pepssi_data/pep_0510213116_0x691_sci.fit
+- Analysis date: 2025-07-30 13:50:45
+
+Dataset Characteristics:
+- Total records: 6
+- Total columns: 1441
+- File size: 14.01 MB
+- Data types: {dtype('float64'): 1440, dtype('int64'): 1}
+
+Column Summary:
+- Time-related columns: 0
+- Count/rate columns: 1440
+- Other columns: 1
+
+Data Quality Assessment:
+- Missing values: 0
+- Duplicate records: 0
+- Numeric columns: 1441
+
+Statistical Summary:
+       record_index  data_col_0  data_col_1  data_col_2  data_col_3  \
+count      6.000000         6.0         6.0         6.0         6.0   
+mean       2.500000         0.0         0.0         0.0         0.0   
+std        1.870829         0.0         0.0         0.0         0.0   
+min        0.000000         0.0         0.0         0.0         0.0   
+25%        1.250000         0.0         0.0         0.0         0.0   
+50%        2.500000         0.0         0.0         0.0         0.0   
+75%        3.750000         0.0         0.0         0.0         0.0   
+max        5.000000         0.0         0.0         0.0         0.0   
+
+       data_col_4  data_col_5  data_col_6  data_col_7  data_col_8  ...  \
+count    6.000000         6.0         6.0    6.000000    6.000000  ...   
+mean     0.005556         0.0         0.0    0.002778    0.002778  ...   
+std      0.008607         0.0         0.0    0.006804    0.006804  ...   
+min      0.000000         0.0         0.0    0.000000    0.000000  ...   
+25%      0.000000         0.0         0.0    0.000000    0.000000  ...   
+50%      0.000000         0.0         0.0    0.000000    0.000000  ...   
+75%      0.012500         0.0         0.0    0.000000    0.000000  ...   
+max      0.016667         0.0         0.0    0.016667    0.016667  ...   
+
+       data_col_1430  data_col_1431  data_col_1432  data_col_1433  \
+count            6.0            6.0            6.0       6.000000   
+mean             0.0            0.0            0.0       0.002778   
+std              0.0            0.0            0.0       0.006804   
+min              0.0            0.0            0.0       0.000000   
+25%              0.0            0.0            0.0       0.000000   
+50%              0.0            0.0            0.0       0.000000   
+75%              0.0            0.0            0.0       0.000000   
+max              0.0            0.0            0.0       0.016667   
+
+       data_col_1434  data_col_1435  data_col_1436  data_col_1437  \
+count            6.0            6.0            6.0            6.0   
+mean             0.0            0.0            0.0            0.0   
+std              0.0            0.0            0.0            0.0   
+min              0.0            0.0            0.0            0.0   
+25%              0.0            0.0            0.0            0.0   
+50%              0.0            0.0            0.0            0.0   
+75%              0.0            0.0            0.0            0.0   
+max              0.0            0.0            0.0            0.0   
+
+       data_col_1438  data_col_1439  
+count            6.0       6.000000  
+mean             0.0       0.002778  
+std              0.0       0.006804  
+min              0.0       0.000000  
+25%              0.0       0.000000  
+50%              0.0       0.000000  
+75%              0.0       0.000000  
+max              0.0       0.016667  
+
+[8 rows x 1441 columns]
+
+Scientific Context:
+- Mission: New Horizons Extended Mission (KEM1)
+- Instrument: PEPSSI (Pluto Energetic Particle Spectrometer Science Investigation)
+- Target date: March 22, 2022
+- Location: Kuiper Belt region, outer solar system
+- Data type: Calibrated energetic particle measurements
+
+Next Steps for Analysis:
+1. Convert time columns to proper datetime format
+2. Identify energy channels and particle types
+3. Analyze directional distributions (sectors)
+4. Look for solar wind and cosmic ray signatures
+5. Compare with other New Horizons instruments
+6. Investigate temporal variations and periodicities
+
+References:
+- PEPSSI Instrument Paper: McNutt et al. (2008)
+- New Horizons Mission: Stern (2008)
+- PDS4 Archive: https://pds-smallbodies.astro.umd.edu/
